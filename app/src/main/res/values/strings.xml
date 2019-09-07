@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">feeder</string>
+    <string name="title_place_holder">This is a title place holder</string>
+    <string name="summary_place_holder">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pulvinar etiam non quam lacus. Quisque non tellus orci ac auctor augue mauris augue neque.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
