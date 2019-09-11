@@ -1,19 +1,10 @@
-package com.keselman.edward.feeder;
-
-import android.util.Log;
+package com.keselman.edward.feeder.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.keselman.edward.feeder.listeners.JsonPlaceHolderApi;
-import com.keselman.edward.feeder.models.Entry;
-import com.keselman.edward.feeder.models.Root;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Api {
@@ -33,9 +24,8 @@ public class Api {
         return sInstance;
     }
 
-    // Build retrofit once when creating a single instance
     private Api() {
-        // Implement a method to build your retrofit
+
         buildRetrofit(BASE_URL);
     }
 
@@ -47,12 +37,11 @@ public class Api {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
         this.mJsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
 
-//        Call<Root> call = jsonPlaceHolderApi.getLinkPosts();
-//        call.enqueue(this);
     }
 
     public JsonPlaceHolderApi getUserService() {

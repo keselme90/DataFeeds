@@ -3,9 +3,12 @@ package com.keselman.edward.feeder.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Filter;
 import android.widget.Filterable;
 
@@ -13,15 +16,16 @@ import com.keselman.edward.feeder.R;
 import com.keselman.edward.feeder.adapters.viewholders.LinkViewHolder;
 import com.keselman.edward.feeder.adapters.viewholders.VideoViewHolder;
 import com.keselman.edward.feeder.models.Entry;
-import com.keselman.edward.feeder.models.Post;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
+import static android.support.constraint.Constraints.TAG;
 
+public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable
+{
     private List<Entry> mPostList;
-    private List<Entry> mPostListFiltered;
+    private List<Entry> mPostListFull;
     private static int TYPE_LINK = 1;
     private static int TYPE_VIDEO = 2;
     private Context mContext;
@@ -30,13 +34,14 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         this.mContext = context;
         this.mPostList = posts;
-        this.mPostListFiltered = posts;
-
+        Log.d(TAG, "PostsAdapter: ");
     }
 
     @Override
-    public int getItemCount() {
-        return mPostListFiltered.size();
+    public int getItemCount()
+    {
+        return mPostList.size();
+//        return mPostListFiltered.size();
     }
 
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
@@ -55,17 +60,26 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
 
+        Animation anim;
+        if(position % 2 == 0)
+            anim = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_right);
+        else
+            anim = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_left);
+
         if (getItemViewType(position) == TYPE_LINK) {
-            ((LinkViewHolder) viewHolder).setDetails(mPostListFiltered.get(position));
+            ((LinkViewHolder) viewHolder).setDetails(mContext, mPostList.get(position));
+            ((LinkViewHolder) viewHolder).mCardView.setAnimation(anim);
         } else {
-            ((VideoViewHolder) viewHolder).setDetails(mPostListFiltered.get(position));
+            ((VideoViewHolder) viewHolder).setDetails(mContext, mPostList.get(position));
+            ((VideoViewHolder) viewHolder).mCardView.setAnimation(anim);
         }
+
     }
 
     @Override
     public int getItemViewType(int position) {
 
-        return mPostListFiltered.get(position).getType().getValue().toLowerCase().equals("link") ? TYPE_LINK : TYPE_VIDEO;
+        return mPostList.get(position).getType().getValue().toLowerCase().equals("link") ? TYPE_LINK : TYPE_VIDEO;
     }
 
     @Override
@@ -74,31 +88,38 @@ public class PostsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
+
                 String searchQuery = charSequence.toString();
-                if(searchQuery.isEmpty()){
-                    mPostListFiltered = mPostList;
-                }
-                else{
-                    List<Entry> filtered = new ArrayList<>();
-                    for(Entry entry : mPostList){
-                        if(entry.getTitle().toLowerCase().contains(searchQuery.toLowerCase())){
-                            filtered.add(entry);
+                List<Entry> filtered = new ArrayList<>();
+                if(mPostListFull != null) {
+                    if (searchQuery.isEmpty()) {
+                        filtered.addAll(mPostListFull);
+                    } else {
+                        for (Entry entry : mPostListFull) {
+                            if (entry.getTitle().toLowerCase().contains(searchQuery.toLowerCase())) {
+                                filtered.add(entry);
+                            }
                         }
                     }
-                    mPostListFiltered = filtered;
                 }
-
                 FilterResults filterResults = new FilterResults();
-                filterResults.values = mPostListFiltered;
+                filterResults.values = filtered;
                 return  filterResults;
             }
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
 
-                mPostListFiltered = (ArrayList<Entry>)filterResults.values;
+                mPostList.clear();
+                mPostList.addAll((List)filterResults.values);
+
                 notifyDataSetChanged();
             }
         };
+    }
+
+    public void setFullList() {
+
+        this.mPostListFull = new ArrayList<>(mPostList);
     }
 }

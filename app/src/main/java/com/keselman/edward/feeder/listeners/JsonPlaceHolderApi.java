@@ -5,15 +5,16 @@ import com.keselman.edward.feeder.models.Root;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface JsonPlaceHolderApi {
 
     @GET("link_json.json")
-    Call<Root> getLinkPosts();
+    Observable<Root> getLinkPosts();
 
     @GET("video_json.json")
-    Call<Root> getVideoPosts();
+    Observable<Root> getVideoPosts();
 
 }

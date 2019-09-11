@@ -29,7 +29,7 @@ public class VideoViewActivity extends AppCompatActivity {
 
         mVideoView = findViewById(R.id.videoview);
 
-        Uri uri = Uri.parse("https://www.demonuts.com/Demonuts/smallvideo.mp4");
+        Uri uri = Uri.parse(intent.getStringExtra("URL_TO_OPEN"));
         mVideoView.setVideoURI(uri);
 
         MediaController mediaController = new MediaController(VideoViewActivity.this);
